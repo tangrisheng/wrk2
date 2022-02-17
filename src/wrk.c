@@ -190,6 +190,11 @@ int main(int argc, char **argv) {
         errors.write   += t->errors.write;
         errors.timeout += t->errors.timeout;
         errors.status  += t->errors.status;
+        errors.status1xx  += t->errors.status1xx;
+        errors.status2xx  += t->errors.status2xx;
+        errors.status3xx  += t->errors.status3xx;
+        errors.status4xx  += t->errors.status4xx;
+        errors.status5xx  += t->errors.status5xx;
 
         hdr_add(latency_histogram, t->latency_histogram);
         hdr_add(u_latency_histogram, t->u_latency_histogram);
@@ -234,6 +239,12 @@ int main(int argc, char **argv) {
     if (errors.status) {
         printf("  Non-2xx or 3xx responses: %d\n", errors.status);
     }
+
+    printf("  1xx responses: %d\n", errors.status1xx);
+    printf("  2xx responses: %d\n", errors.status2xx);
+    printf("  3xx responses: %d\n", errors.status3xx);
+    printf("  4xx responses: %d\n", errors.status4xx);
+    printf("  5xx responses: %d\n", errors.status5xx);
 
     printf("Requests/sec: %9.2Lf\n", req_per_s);
     printf("Transfer/sec: %10sB\n", format_binary(bytes_per_s));
@@ -492,6 +503,26 @@ static int response_complete(http_parser *parser) {
 
     if (status > 399) {
         thread->errors.status++;
+    }
+
+    if (status >= 100 && status <= 199) {
+        thread->errors.status1xx++;
+    }
+
+    if (status >= 200 && status <= 299) {
+        thread->errors.status2xx++;
+    }
+
+    if (status >= 300 && status <= 399) {
+        thread->errors.status3xx++;
+    }
+
+    if (status >= 400 && status <= 499) {
+        thread->errors.status4xx++;
+    }
+
+    if (status >= 500 && status <= 599) {
+        thread->errors.status5xx++;
     }
 
     if (c->headers.buffer) {

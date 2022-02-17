@@ -14,6 +14,11 @@ typedef struct {
     uint32_t read;
     uint32_t write;
     uint32_t status;
+    uint32_t status1xx;
+    uint32_t status2xx;
+    uint32_t status3xx;
+    uint32_t status4xx;
+    uint32_t status5xx;
     uint32_t timeout;
 } errors;
 
